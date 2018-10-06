@@ -5,10 +5,11 @@
 
 --]]
 
-local gears = require("gears")
-local lain  = require("lain")
-local awful = require("awful")
-local wibox = require("wibox")
+local gears   = require("gears")
+local lain    = require("lain")
+local awful   = require("awful")
+local wibox   = require("wibox")
+local radical = require("radical")
 
 local os = { getenv = os.getenv }
 local my_table = awful.util.table or gears.table -- 4.{0,1} compatibility
@@ -17,7 +18,7 @@ local theme                                     = {}
 theme.default_dir                               = require("awful.util").get_themes_dir() .. "default"
 theme.dir                                       = os.getenv("HOME") .. "/.config/awesome/themes/lju"
 theme.wallpaper                                 = theme.dir .. "/wall.png"
-theme.font                                      = "Tamsyn 10.5"
+theme.font                                      = "Roboto Bold 10"
 theme.fg_normal                                 = "#9E9E9E"
 theme.fg_focus                                  = "#EBEBFF"
 theme.bg_normal                                 = "#242424"
@@ -32,6 +33,8 @@ theme.taglist_bg_focus                          = "#242424"
 theme.menu_height                               = 16
 theme.menu_width                                = 140
 theme.ocol                                      = "<span color='" .. theme.fg_normal .. "'>"
+theme.tasklist_bg_minimize                      = "#3D3D3D"
+theme.tasklist_fg_minimize                      = "#708EE9"
 theme.tasklist_sticky                           = theme.ocol .. "[S]</span>"
 theme.tasklist_ontop                            = theme.ocol .. "[T]</span>"
 theme.tasklist_floating                         = theme.ocol .. "[F]</span>"
@@ -227,6 +230,24 @@ local bat = lain.widget.bat({
     end
 })
 
+-- Radical
+local menu = radical.context{}
+menu:add_item {text="Screen 1",button1=function(_menu,item,mods) print("Hello World! ") end}
+menu:add_item {text="Screen 9",icon= beautiful.awesome_icon}
+menu:add_item {text="Sub Menu",sub_menu = function()
+    local smenu = radical.context{}
+    smenu:add_item{text="item 1"}
+    smenu:add_item{text="item 2"}
+    return smenu
+end}
+
+-- To add the menu to a widget:
+local mytextbox = wibox.widget.textbox('Search')
+mytextbox:set_menu(menu, "button::pressed", 3) -- 3 = right mouse button, 1 = left mouse button
+
+-- To add a key binding on a "box" menu (and every other types)
+menu:add_key_binding({"Mod4", "Control", "Shift"},",")
+
 -- Separators
 local first = wibox.widget.textbox(markup.font("Tamsyn 4", " "))
 local spr   = wibox.widget.textbox(' ')
@@ -297,6 +318,7 @@ function theme.at_screen_connect(s)
             volumewidget,
             wibox.container.background(wibox.container.margin(wibox.widget { baticon, bat.widget, layout = wibox.layout.align.horizontal }, 3, 3), bg_normal),
             mytextclock,
+            mytextbox
         },
     }
 end

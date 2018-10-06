@@ -321,13 +321,13 @@ globalkeys = my_table.join(
               {description = "view  previous nonempty", group = "tag"}),
 
     -- Default client focus
-    awful.key({ modkey, "Control" }, "j",
+    awful.key({ modkey }, ";",
         function ()
             awful.client.focus.byidx( 1)
         end,
         {description = "focus next by index", group = "client"}
     ),
-    awful.key({ modkey, "Control" }, "k",
+    awful.key({ modkey, "Shift" }, ";",
         function ()
             awful.client.focus.byidx(-1)
         end,
@@ -394,7 +394,7 @@ globalkeys = my_table.join(
         {description = "toggle wibox", group = "awesome"}),
 
     -- Open file manager
-    awful.key({ modkey, "Shift" }, "o",
+    awful.key({ modkey }, "e",
         function () awful.util.spawn("nautilus --no-desktop") end,
         {description = "Open nautilus", group = "hotkeys"}),
 
@@ -643,7 +643,7 @@ clientkeys = my_table.join(
               {description = "toggle floating", group = "client"}),
     awful.key({ modkey, "Control" }, "Return", function (c) c:swap(awful.client.getmaster()) end,
               {description = "move to master", group = "client"}),
-    awful.key({ modkey, "Control" }, "o",      function (c) c:move_to_screen()               end,
+    awful.key({ modkey, "Shift", "Control" }, "o",      function (c) c:move_to_screen()               end,
               {description = "move to screen", group = "client"}),
     awful.key({ modkey,           }, "t",      function (c) c.ontop = not c.ontop            end,
               {description = "toggle keep on top", group = "client"}),
