@@ -25,7 +25,7 @@ local themes = {
 local chosen_theme = themes[5]
 local modkey       = "Mod4"
 local altkey       = "Mod1"
-local terminal     = "alacritty"
+local terminal     = "st"
 local editor       = os.getenv("EDITOR") or "vim"
 local gui_editor   = "gvim"
 local browser      = "google-chrome"
@@ -60,6 +60,7 @@ lain          = require("lain")
 menubar       = require("menubar")
 freedesktop   = require("freedesktop")
 hotkeys_popup = require("awful.hotkeys_popup").widget
+radical       = require("radical")
                       require("awful.hotkeys_popup.keys")
 
 local my_table      = awful.util.table or gears.table -- 4.{0,1} compatibility
@@ -120,13 +121,34 @@ awful.spawn.with_shell(
 
 -- }}}
 
--- Guake-style dropdown for documentation
-local zeal = lain.util.quake({
-  app    = docs,
-  horiz  = "center",
-  height = q_height,
-  width  = q_width
-})
+local quakes = {
+  -- Guake-style dropdown for Chrome
+  browser = lain.util.quake({
+    app    = "google-chrome --new-window",
+    horiz  = "center",
+    vert   = "center",
+    height = q_height,
+    width  = q_width
+  }),
+
+  -- Guake-style dropdown for the terminal
+  terminal = lain.util.quake({
+    app    = terminal,
+    horiz  = "center",
+    height = q_height,
+    width  = q_width
+  }),
+
+  -- Guake-style dropdown for Zeal
+  docs = lain.util.quake({
+    app    = docs,
+    horiz  = "center",
+    vert   = "bottom",
+    height = q_height,
+    width  = q_width
+  })
+}
+
 -- We use this function later on to switch opacity on client windows. Uses a
 -- closure to keep track of the notification id.
 local change_opacity = (function()
@@ -417,7 +439,7 @@ globalkeys = my_table.join(
               {description = "delete tag", group = "tag"}),
 
     -- Standard program
-    awful.key({ modkey,           }, "Return", function () awful.spawn(terminal) end,
+    awful.key({ modkey, "Shift"   }, "Return", function () awful.spawn(terminal) end,
               {description = "open a terminal", group = "launcher"}),
     awful.key({ modkey, "Control" }, "r", awesome.restart,
               {description = "reload awesome", group = "awesome"}),
@@ -451,10 +473,6 @@ globalkeys = my_table.join(
                   end
               end,
               {description = "restore minimized", group = "client"}),
-
-    -- Dropdown application
-    awful.key({ modkey, }, "z", function () zeal:toggle() end,
-              {description = "dropdown documentation", group = "launcher"}),
 
     -- Widgets popups
     --awful.key({ altkey, }, "c", function () lain.widget.calendar.show(7) end,
@@ -778,8 +796,19 @@ awful.rules.rules = {
     --{ rule = { class = "Google-chrome" },
       --properties = { screen = 1, tag = awful.util.tagnames[1] } },
 
-    { rule_any = { role = { "pop-up" }, class = { "Shutter" } },
-      properties = { floating = true, opacity = 0.9 } },
+    { rule_any = { role = { "pop-up" }, class = { "Gnome-calculator", "Shutter" } },
+        properties = { floating = true, opacity = 0.95 } },
+
+    { rule = { class = "SimpleScreenRecorder" },
+        properties = { floating = true, opacity = 0.85 } },
+
+    { rule = { class = "Key-mon" },
+      properties = { floating = true, opacity = 0.95 },
+      callback = function (c)
+        local f = awful.placement.top_right + awful.placement.no_offscreen
+        f(c, nil) 
+      end 
+    },
 
     { rule = { class = "Gimp", role = "gimp-image-window" },
           properties = { maximized = true } },
@@ -862,6 +891,15 @@ function border_adjust(c)
         c.border_color = beautiful.border_focus
     end
 end
+
+local my_menu = radical.box{
+  enable_keyboard = true
+}
+
+my_menu:add_item {text='Chrome', button1=function(_menu,item,mods) quakes.browser:toggle() end }
+my_menu:add_item {text='Terminal', button1=function(_menu,item,mods) quakes.terminal:toggle() end }
+my_menu:add_item {text='Zeal', button1=function(_menu,item,mods) quakes.docs:toggle() end }
+my_menu:add_key_binding({modkey}, "Return")
 
 client.connect_signal("property::maximized", border_adjust)
 client.connect_signal("focus", border_adjust)
