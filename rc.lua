@@ -22,18 +22,20 @@ local themes = {
     "vertex",          -- 11
 }
 
-local chosen_theme = themes[5]
-local modkey       = "Mod4"
-local altkey       = "Mod1"
-local terminal     = "st"
-local editor       = os.getenv("EDITOR") or "vim"
-local gui_editor   = "gvim"
-local browser      = "google-chrome"
-local guieditor    = "gvim"
-local scrlocker    = "slock"
-local docs         = "zeal"
-local q_height     = 0.5
-local q_width      = 0.75
+local chosen_theme   = themes[5]
+local modkey         = "Mod4"
+local altkey         = "Mod1"
+local terminal       = "st"
+local editor         = os.getenv("EDITOR") or "vim"
+local gui_editor     = "gvim"
+local browser        = "google-chrome"
+local guieditor      = "gvim"
+local scrlocker      = "slock"
+local docs           = "zeal"
+local q_height       = 0.6
+local q_width        = 0.8
+local q_height_large = 0.9
+local q_width_large  = 0.9
 
 -- Override awesome.quit when we're using GNOME
 _awesome_quit = awesome.quit
@@ -60,7 +62,6 @@ lain          = require("lain")
 menubar       = require("menubar")
 freedesktop   = require("freedesktop")
 hotkeys_popup = require("awful.hotkeys_popup").widget
-radical       = require("radical")
                       require("awful.hotkeys_popup.keys")
 
 local my_table      = awful.util.table or gears.table -- 4.{0,1} compatibility
@@ -121,33 +122,41 @@ awful.spawn.with_shell(
 
 -- }}}
 
+lju = {}
+
 local quakes = {
-  -- Guake-style dropdown for Chrome
   browser = lain.util.quake({
-    app    = "google-chrome --new-window",
-    horiz  = "center",
-    vert   = "center",
-    height = q_height,
-    width  = q_width
+    app     = "google-chrome",
+    name    = "google-chrome",
+    argname = "www.google.com",
+    extra   = "--new-window",
+    horiz   = "center",
+    vert    = "center",
+    height  = q_height_large,
+    width   = q_width_large
   }),
 
-  -- Guake-style dropdown for the terminal
   terminal = lain.util.quake({
     app    = terminal,
+    name    = "Quake-"..terminal,
+    argname = "-n %s",
     horiz  = "center",
     height = q_height,
     width  = q_width
   }),
 
-  -- Guake-style dropdown for Zeal
   docs = lain.util.quake({
     app    = docs,
+    name    = "Quake-"..docs,
+    argname = "-name %s",
     horiz  = "center",
     vert   = "bottom",
     height = q_height,
     width  = q_width
   })
 }
+
+lju.quakes = quakes
 
 -- We use this function later on to switch opacity on client windows. Uses a
 -- closure to keep track of the notification id.
@@ -326,7 +335,7 @@ globalkeys = my_table.join(
               {description = "lock screen", group = "hotkeys"}),
 
     -- Hotkeys
-    awful.key({ modkey,           }, "s",      hotkeys_popup.show_help,
+    awful.key({ modkey, "Shift"   }, "s",      hotkeys_popup.show_help,
               {description = "show help", group="awesome"}),
     -- Tag browsing
     awful.key({ modkey,           }, "Left",   awful.tag.viewprev,
@@ -381,7 +390,7 @@ globalkeys = my_table.join(
             if client.focus then client.focus:raise() end
         end,
         {description = "focus right", group = "client"}),
-    awful.key({ modkey,           }, "w", function () awful.util.mymainmenu:show() end,
+    awful.key({ modkey, "Shift"   }, "w", function () awful.util.mymainmenu:show() end,
               {description = "show main menu", group = "awesome"}),
 
     -- Layout manipulation
@@ -393,7 +402,7 @@ globalkeys = my_table.join(
               {description = "focus the next screen", group = "screen"}),
     awful.key({ modkey, "Control", "Shift" }, "k", function () awful.screen.focus_relative(-1) end,
               {description = "focus the previous screen", group = "screen"}),
-    awful.key({ modkey,           }, "u", awful.client.urgent.jumpto,
+    awful.key({ modkey, "Control" }, "u", awful.client.urgent.jumpto,
               {description = "jump to urgent client", group = "client"}),
     awful.key({ modkey,           }, "Tab",
         function ()
@@ -474,12 +483,53 @@ globalkeys = my_table.join(
               end,
               {description = "restore minimized", group = "client"}),
 
+    -- Dropdown applications
+    awful.key({ modkey, }, "w",
+        function ()
+            quakes.browser.visible = true
+            quakes.browser:display()
+        end,
+        {description = "dropdown browser", group = "launcher"}),
+
+    awful.key({ modkey, "Control" }, "w",
+        function ()
+            quakes.browser:toggle()
+        end,
+        {description = "toggle dropdown browser", group = "launcher"}),
+
+    awful.key({ modkey, }, "s",
+        function ()
+            quakes.terminal.visible = true
+            quakes.terminal:display()
+        end,
+        {description = "dropdown st terminal", group = "launcher"}),
+
+    awful.key({ modkey, "Control" }, "s",
+        function ()
+            quakes.terminal:toggle()
+        end,
+        {description = "toggle dropdown st terminal", group = "launcher"}),
+
+    awful.key({ modkey, }, "d",
+        function ()
+            quakes.docs.visible = true
+            quakes.docs:display()
+        end,
+        {description = "dropdown documentation", group = "launcher"}),
+
+    -- Dropdown applications
+    awful.key({ modkey, "Control" }, "d",
+        function ()
+            quakes.docs:toggle()
+        end,
+        {description = "toggle dropdown documentation", group = "launcher"}),
+
     -- Widgets popups
     --awful.key({ altkey, }, "c", function () lain.widget.calendar.show(7) end,
               --{description = "show calendar", group = "widgets"}),
     awful.key({ altkey, "Control", "Shift" }, "h", function () if beautiful.fs then beautiful.fs.show(7) end end,
               {description = "show filesystem", group = "widgets"}),
-    awful.key({ altkey, }, "w", function () if beautiful.weather then beautiful.weather.show(7) end end,
+    awful.key({ altkey, "Shift" }, "w", function () if beautiful.weather then beautiful.weather.show(7) end end,
               {description = "show weather", group = "widgets"}),
 
     -- Brightness
@@ -617,7 +667,7 @@ globalkeys = my_table.join(
               {description = "run prompt", group = "launcher"}),
 
     -- surfraw search
-    awful.key({ modkey }, "o", function()
+    awful.key({ modkey }, "[", function()
         awful.prompt.run({
             exe_callback = function(input) awful.util.spawn_with_shell("woog " .. input) end,
             textbox  = awful.screen.focused().mypromptbox.widget,
@@ -626,7 +676,7 @@ globalkeys = my_table.join(
         }) end, {description = "search google chrome", group = "launcher"}),
 
     -- surfraw open chrome literally
-    awful.key({ modkey, "Control" }, "o", function()
+    awful.key({ modkey, "Control" }, "[", function()
         awful.prompt.run({
             exe_callback = function(input) awful.util.spawn_with_shell(browser .. " " .. input) end,
             textbox  = awful.screen.focused().mypromptbox.widget,
@@ -891,15 +941,6 @@ function border_adjust(c)
         c.border_color = beautiful.border_focus
     end
 end
-
-local my_menu = radical.box{
-  enable_keyboard = true
-}
-
-my_menu:add_item {text='Chrome', button1=function(_menu,item,mods) quakes.browser:toggle() end }
-my_menu:add_item {text='Terminal', button1=function(_menu,item,mods) quakes.terminal:toggle() end }
-my_menu:add_item {text='Zeal', button1=function(_menu,item,mods) quakes.docs:toggle() end }
-my_menu:add_key_binding({modkey}, "Return")
 
 client.connect_signal("property::maximized", border_adjust)
 client.connect_signal("focus", border_adjust)
