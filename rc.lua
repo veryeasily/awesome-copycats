@@ -484,33 +484,33 @@ globalkeys = my_table.join(
               {description = "restore minimized", group = "client"}),
 
     -- Dropdown applications
-    awful.key({ modkey, }, "w",
+    awful.key({ modkey, "Control" }, "w",
         function ()
             quakes.browser.visible = true
             quakes.browser:display()
         end,
         {description = "dropdown browser", group = "launcher"}),
 
-    awful.key({ modkey, "Control" }, "w",
+    awful.key({ modkey, }, "w",
         function ()
             quakes.browser:toggle()
         end,
         {description = "toggle dropdown browser", group = "launcher"}),
 
-    awful.key({ modkey, }, "s",
+    awful.key({ modkey, "Control" }, "s",
         function ()
             quakes.terminal.visible = true
             quakes.terminal:display()
         end,
         {description = "dropdown st terminal", group = "launcher"}),
 
-    awful.key({ modkey, "Control" }, "s",
+    awful.key({ modkey, }, "s",
         function ()
             quakes.terminal:toggle()
         end,
         {description = "toggle dropdown st terminal", group = "launcher"}),
 
-    awful.key({ modkey, }, "d",
+    awful.key({ modkey, "Control" }, "d",
         function ()
             quakes.docs.visible = true
             quakes.docs:display()
@@ -518,7 +518,7 @@ globalkeys = my_table.join(
         {description = "dropdown documentation", group = "launcher"}),
 
     -- Dropdown applications
-    awful.key({ modkey, "Control" }, "d",
+    awful.key({ modkey, }, "d",
         function ()
             quakes.docs:toggle()
         end,
