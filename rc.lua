@@ -126,14 +126,17 @@ lju = {}
 
 local quakes = {
   browser = lain.util.quake({
-    app     = "google-chrome",
-    name    = "google-chrome",
-    argname = "www.google.com",
-    extra   = "--new-window",
-    horiz   = "center",
-    vert    = "center",
-    height  = q_height_large,
-    width   = q_width_large
+    app      = "google-chrome",
+    name     = "google-chrome",
+    argname  = "www.google.com",
+    extra    = "--new-window",
+    horiz    = "center",
+    vert     = "center",
+    height   = q_height_large,
+    width    = q_width_large,
+    settings = function (c)
+      c.above = false
+    end,
   }),
 
   terminal = lain.util.quake({
@@ -142,7 +145,10 @@ local quakes = {
     argname = "-n %s",
     horiz  = "center",
     height = q_height,
-    width  = q_width
+    width  = q_width,
+    settings = function (c)
+      c.above = false
+    end,
   }),
 
   docs = lain.util.quake({
@@ -152,11 +158,17 @@ local quakes = {
     horiz  = "center",
     vert   = "bottom",
     height = q_height,
-    width  = q_width
+    width  = q_width,
+    settings = function (c)
+      c.above = false
+    end,
   })
 }
 
 lju.quakes = quakes
+
+local mod_with_ctrl    = { modkey, "Control", }
+local mod_without_ctrl = { modkey,            }
 
 -- We use this function later on to switch opacity on client windows. Uses a
 -- closure to keep track of the notification id.
@@ -484,33 +496,33 @@ globalkeys = my_table.join(
               {description = "restore minimized", group = "client"}),
 
     -- Dropdown applications
-    awful.key({ modkey, "Control" }, "w",
+    awful.key(mod_without_ctrl, "w",
         function ()
             quakes.browser.visible = true
             quakes.browser:display()
         end,
         {description = "dropdown browser", group = "launcher"}),
 
-    awful.key({ modkey, }, "w",
+    awful.key(mod_with_ctrl, "w",
         function ()
             quakes.browser:toggle()
         end,
         {description = "toggle dropdown browser", group = "launcher"}),
 
-    awful.key({ modkey, "Control" }, "s",
+    awful.key(mod_without_ctrl, "s",
         function ()
             quakes.terminal.visible = true
             quakes.terminal:display()
         end,
         {description = "dropdown st terminal", group = "launcher"}),
 
-    awful.key({ modkey, }, "s",
+    awful.key(mod_with_ctrl, "s",
         function ()
             quakes.terminal:toggle()
         end,
         {description = "toggle dropdown st terminal", group = "launcher"}),
 
-    awful.key({ modkey, "Control" }, "d",
+    awful.key(mod_without_ctrl, "d",
         function ()
             quakes.docs.visible = true
             quakes.docs:display()
@@ -518,7 +530,7 @@ globalkeys = my_table.join(
         {description = "dropdown documentation", group = "launcher"}),
 
     -- Dropdown applications
-    awful.key({ modkey, }, "d",
+    awful.key(mod_with_ctrl, "d",
         function ()
             quakes.docs:toggle()
         end,
